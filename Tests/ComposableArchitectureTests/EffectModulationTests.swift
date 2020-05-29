@@ -239,7 +239,7 @@ final class EffectModulationTests: XCTestCase {
     
     b.send(completion: .finished)
     
-    // This doesn't work how I expected it to.
+    // This test fails because the Combine operator doesn't work how I expected it to.
     // https://github.com/CombineCommunity/rxswift-to-combine-cheatsheet/issues/19
     XCTAssertEqual(values, [1, 2, 3])
   }
@@ -289,7 +289,7 @@ final class EffectModulationTests: XCTestCase {
     XCTAssertEqual(
       values,
       [1, 2, 4, 5, 6],
-      "b wasn't cancelled by the new effect since Effect IDs derive their value from where they're physically located in code."
+      "b wasn't cancelled by the new effect since Effect IDs derive their uniqueness from where they're physically located in code."
     )
     
     cancellables.forEach { $0.cancel() }

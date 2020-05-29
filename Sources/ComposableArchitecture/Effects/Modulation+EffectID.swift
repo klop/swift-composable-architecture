@@ -2,7 +2,7 @@ import Combine
 
 public struct EffectID: Hashable {
   private let rawValue: AnyHashable
-    
+  
   init<Value: Hashable>(_ value: Value) {
     rawValue = value
   }

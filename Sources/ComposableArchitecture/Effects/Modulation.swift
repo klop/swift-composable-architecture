@@ -65,7 +65,7 @@ extension Effect where Failure == Never {
         .eraseToEffect()
     }
   }
-
+  
   public func maxConcurrent(id: AnyHashable, max: Int) -> Effect {
     modulate(id: id) { effects in
       effects
