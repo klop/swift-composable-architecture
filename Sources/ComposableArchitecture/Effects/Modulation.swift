@@ -1,6 +1,6 @@
 import Combine
 
-extension Effect {
+extension Effect where Failure == Never {
   func modulate(
     id: AnyHashable,
     flatten: @escaping (AnyPublisher<Effect<Output, Failure>, Failure>) -> Effect
@@ -15,15 +15,17 @@ extension Effect {
       contexts[id] = SubjectContext(subject: subject)
       
       return flatten(subject.prepend(self).eraseToAnyPublisher())
-        .handleEvents(receiveCancel: { contexts[id] = nil })
+        .handleEvents(receiveCancel: {
+          contexts[id] = nil
+        })
         .eraseToAnyPublisher()
     }
     .eraseToEffect()
   }
   
   public func cancellable2(id: AnyHashable) -> Effect {
-    modulate(id: id) { publisher in
-      publisher
+    modulate(id: id) { effects in
+      effects
         .switchToLatest()
         .eraseToEffect()
     }
@@ -43,8 +45,8 @@ extension Effect {
     scheduler: S,
     latest: Bool
   ) -> Effect where S: Scheduler {
-    modulate(id: id) { publisher in
-      publisher
+    modulate(id: id) { effects in
+      effects
         .throttle(for: interval, scheduler: scheduler, latest: latest)
         .switchToLatest()
         .eraseToEffect()
@@ -56,8 +58,8 @@ extension Effect {
     for dueTime: S.SchedulerTimeType.Stride,
     scheduler: S
   ) -> Effect where S: Scheduler {
-    modulate(id: id) { publisher in
-      publisher
+    modulate(id: id) { effects in
+      effects
         .debounce(for: dueTime, scheduler: scheduler)
         .switchToLatest()
         .eraseToEffect()
@@ -65,8 +67,8 @@ extension Effect {
   }
 
   public func maxConcurrent(id: AnyHashable, max: Int) -> Effect {
-    modulate(id: id) { publisher in
-      publisher
+    modulate(id: id) { effects in
+      effects
         .flatMap(maxPublishers: .max(max)) { $0 }
         .eraseToEffect()
     }
